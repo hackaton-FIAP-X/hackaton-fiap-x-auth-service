@@ -131,6 +131,7 @@ class AuthControllerRegisterTest {
 
   @Test
   void neverLogsTheRawPassword() throws Exception {
+    // Test 1: Happy path (201 CREATED)
     String rawPassword = "SenhaQueNuncaDeveApareceNoLog99";
     String payload =
         """
@@ -147,5 +148,24 @@ class AuthControllerRegisterTest {
             .anyMatch(event -> event.getFormattedMessage().contains(rawPassword));
 
     assertThat(passwordLeakedToLogs).isFalse();
+
+    // Test 2: Validation failure path (400 BAD_REQUEST) - highest risk path
+    // Spring's validation error machinery may log rejected values; this proves it doesn't
+    String shortPassword = "abc123";
+    String validationFailurePayload =
+        """
+        {"name":"Fátima Silva","email":"fatima.registro@example.com","password":"%s"}
+        """
+            .formatted(shortPassword);
+
+    mockMvc
+        .perform(post("/auth/register").contentType("application/json").content(validationFailurePayload))
+        .andExpect(status().isBadRequest());
+
+    boolean shortPasswordLeakedToLogs =
+        logAppender.list.stream()
+            .anyMatch(event -> event.getFormattedMessage().contains(shortPassword));
+
+    assertThat(shortPasswordLeakedToLogs).isFalse();
   }
 }
