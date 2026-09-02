@@ -1,6 +1,24 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: auth-service-postgres
+    environment:
+      - POSTGRES_DB=auth_service
+      - POSTGRES_USER=auth_service
+      - POSTGRES_PASSWORD=auth_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth_service_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_service -d auth_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   auth-service:
     build:
       context: .
@@ -19,4 +37,15 @@ services:
       - SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
       - SPRING_DEVTOOLS_RESTART_POLL_INTERVAL=2s
       - SPRING_DEVTOOLS_RESTART_QUIET_PERIOD=1s
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=auth_service
+      - DB_USER=auth_service
+      - DB_PASSWORD=auth_service
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+
+volumes:
+  auth_service_postgres_data:
