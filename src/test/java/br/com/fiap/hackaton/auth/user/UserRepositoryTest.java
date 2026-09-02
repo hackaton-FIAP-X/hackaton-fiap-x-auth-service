@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -21,6 +22,8 @@ class UserRepositoryTest {
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private Environment environment;
 
   @Test
   void savesAndReadsUserBackByEmail() {
@@ -46,5 +49,13 @@ class UserRepositoryTest {
 
     assertThrows(
         DataIntegrityViolationException.class, () -> userRepository.saveAndFlush(duplicate));
+  }
+
+  @Test
+  void mainApplicationConfigurationIsLoadedFromYaml() {
+    // Verify spring.jpa.hibernate.ddl-auto is set to 'validate'
+    // This proves src/main/resources/application.yml is properly loaded
+    String ddlAuto = environment.getProperty("spring.jpa.hibernate.ddl-auto");
+    assertThat(ddlAuto).isEqualTo("validate");
   }
 }
