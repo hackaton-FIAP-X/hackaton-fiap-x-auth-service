@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 class AuthControllerRegisterTest {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private MockMvc mockMvc;
@@ -143,11 +143,7 @@ class AuthControllerRegisterTest {
         .perform(post("/auth/register").contentType("application/json").content(payload))
         .andExpect(status().isCreated());
 
-    boolean passwordLeakedToLogs =
-        logAppender.list.stream()
-            .anyMatch(event -> event.getFormattedMessage().contains(rawPassword));
-
-    assertThat(passwordLeakedToLogs).isFalse();
+    assertThat(logContainsPasswordAnywhere(rawPassword)).isFalse();
 
     // Test 2: Validation failure path (400 BAD_REQUEST) - highest risk path
     // Spring's validation error machinery may log rejected values; this proves it doesn't
@@ -159,13 +155,31 @@ class AuthControllerRegisterTest {
             .formatted(shortPassword);
 
     mockMvc
-        .perform(post("/auth/register").contentType("application/json").content(validationFailurePayload))
+        .perform(
+            post("/auth/register")
+                .contentType("application/json")
+                .content(validationFailurePayload))
         .andExpect(status().isBadRequest());
 
-    boolean shortPasswordLeakedToLogs =
-        logAppender.list.stream()
-            .anyMatch(event -> event.getFormattedMessage().contains(shortPassword));
+    assertThat(logContainsPasswordAnywhere(shortPassword)).isFalse();
+  }
 
-    assertThat(shortPasswordLeakedToLogs).isFalse();
+  private boolean logContainsPasswordAnywhere(String password) {
+    return logAppender.list.stream()
+        .anyMatch(
+            event ->
+                event.getFormattedMessage().contains(password)
+                    || throwableProxyContainsPassword(event.getThrowableProxy(), password));
+  }
+
+  private static boolean throwableProxyContainsPassword(IThrowableProxy proxy, String password) {
+    while (proxy != null) {
+      String message = proxy.getMessage();
+      if (message != null && message.contains(password)) {
+        return true;
+      }
+      proxy = proxy.getCause();
+    }
+    return false;
   }
 }

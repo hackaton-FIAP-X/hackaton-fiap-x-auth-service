@@ -1,9 +1,14 @@
 server:
   port: 8080
+  error:
+    include-message: never
+    include-binding-errors: never
 
 spring:
   application:
     name: auth-service
+  mvc:
+    log-resolved-exception: false
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:auth_service}
     username: ${DB_USER:auth_service}
@@ -27,6 +32,19 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+# Defense-in-depth for the spring.mvc.log-resolved-exception leak (see spring.mvc above):
+# if that flag is ever re-enabled at higher precedence than this file (e.g. forced via
+# -D/env var, or a test-level property override), Spring's AbstractHandlerExceptionResolver
+# subclasses still log "Resolved [" + ex + "]" at WARN with the full exception message
+# (including any rejected field values, e.g. a submitted password) unless their warn logger
+# category is itself silenced. Silencing the categories directly ensures the leak cannot
+# resurface just because spring.mvc.log-resolved-exception got overridden somewhere.
+logging:
+  level:
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: "OFF"
+    org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver: "OFF"
+    org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver: "OFF"
 
 app:
   security:
