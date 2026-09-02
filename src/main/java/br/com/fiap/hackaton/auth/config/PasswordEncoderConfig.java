@@ -11,8 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class PasswordEncoderConfig {
 
   @Bean
-  public PasswordEncoder passwordEncoder(
-      @Value("${app.security.password-pepper}") String pepper) {
+  public PasswordEncoder passwordEncoder(@Value("${app.security.password-pepper}") String pepper) {
     return new PepperedPasswordEncoder(
         Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8(), pepper);
   }
