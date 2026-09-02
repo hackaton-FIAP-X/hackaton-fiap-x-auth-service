@@ -6,11 +6,10 @@ import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(
     @NotBlank(message = "name is required") String name,
-    @NotBlank(message = "email is required")
-        @Email(message = "email must be a valid email address")
+    @NotBlank(message = "email is required") @Email(message = "email must be a valid email address")
         String email,
     @NotBlank(message = "password is required")
-        @Size(min = 8, message = "password must be at least 8 characters")
+        @Size(min = 8, max = 128, message = "password must be between 8 and 128 characters")
         String password) {
 
   @Override

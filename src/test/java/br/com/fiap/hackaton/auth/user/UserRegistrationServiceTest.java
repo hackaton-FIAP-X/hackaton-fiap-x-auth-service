@@ -16,8 +16,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 class UserRegistrationServiceTest {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private UserRegistrationService userRegistrationService;
@@ -40,13 +39,24 @@ class UserRegistrationServiceTest {
   @Test
   void throwsEmailAlreadyRegisteredExceptionOnDuplicateEmail() {
     String email = "duplicado.service@example.com";
-    userRegistrationService.register(
-        new RegisterRequest("Gustavo Prado", email, "PrimeiraSenha1"));
+    userRegistrationService.register(new RegisterRequest("Gustavo Prado", email, "PrimeiraSenha1"));
 
     RegisterRequest duplicate = new RegisterRequest("Helena Dias", email, "SegundaSenha2");
 
     assertThatThrownBy(() -> userRegistrationService.register(duplicate))
         .isInstanceOf(EmailAlreadyRegisteredException.class)
         .hasMessageContaining(email);
+  }
+
+  @Test
+  void throwsEmailAlreadyRegisteredExceptionOnCaseInsensitiveDuplicateEmail() {
+    userRegistrationService.register(
+        new RegisterRequest("Ana Paula", "Ana@Example.com", "PrimeiraSenha1"));
+
+    RegisterRequest duplicate =
+        new RegisterRequest("Ana Duplicada", "ana@example.com", "SegundaSenha2");
+
+    assertThatThrownBy(() -> userRegistrationService.register(duplicate))
+        .isInstanceOf(EmailAlreadyRegisteredException.class);
   }
 }

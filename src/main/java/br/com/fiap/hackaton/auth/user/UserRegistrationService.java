@@ -1,5 +1,6 @@
 package br.com.fiap.hackaton.auth.user;
 
+import java.util.Locale;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,8 @@ public class UserRegistrationService {
 
   public User register(RegisterRequest request) {
     String passwordHash = passwordEncoder.encode(request.password());
-    User user = new User(request.name(), request.email(), passwordHash, UserRole.USER);
+    String normalizedEmail = request.email().trim().toLowerCase(Locale.ROOT);
+    User user = new User(request.name(), normalizedEmail, passwordHash, UserRole.USER);
 
     try {
       return userRepository.saveAndFlush(user);
