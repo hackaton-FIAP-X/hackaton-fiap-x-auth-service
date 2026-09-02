@@ -40,6 +40,7 @@ services:
       - DB_NAME=auth_service
       - DB_USER=auth_service
       - DB_PASSWORD=auth_service
+      - PASSWORD_PEPPER=local-dev-pepper-change-me
     depends_on:
       postgres:
         condition: service_healthy

@@ -27,3 +27,7 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+app:
+  security:
+    password-pepper: ${PASSWORD_PEPPER}

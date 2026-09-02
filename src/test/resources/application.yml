@@ -1,0 +1,3 @@
+app:
+  security:
+    password-pepper: test-only-pepper-do-not-use-in-production
