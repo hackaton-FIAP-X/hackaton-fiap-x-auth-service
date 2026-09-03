@@ -81,6 +81,16 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
+        <!-- Password hashing (Argon2id + Pepper) -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.85.2</version>
+        </dependency>
         <!-- DevTools for hot reload -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -123,6 +133,17 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <PASSWORD_PEPPER>test-only-pepper-do-not-use-in-production</PASSWORD_PEPPER>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 

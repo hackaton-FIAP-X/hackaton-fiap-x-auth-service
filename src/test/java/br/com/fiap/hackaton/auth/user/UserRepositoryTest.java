@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.core.env.Environment;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -21,6 +22,8 @@ class UserRepositoryTest {
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private UserRepository userRepository;
+
+  @Autowired private Environment environment;
 
   @Test
   void savesAndReadsUserBackByEmail() {
@@ -46,5 +49,16 @@ class UserRepositoryTest {
 
     assertThrows(
         DataIntegrityViolationException.class, () -> userRepository.saveAndFlush(duplicate));
+  }
+
+  @Test
+  void mainApplicationConfigurationIsLoadedFromYaml() {
+    // Verify spring.jpa.hibernate.ddl-auto is set to 'validate'.
+    // Tests have no src/test/resources/application.yml of their own, so this value can only
+    // come from src/main/resources/application.yml, proving that file is genuinely loaded
+    // for the test classpath (the ${PASSWORD_PEPPER} placeholder it also declares is resolved
+    // via the -DPASSWORD_PEPPER system property injected by the Surefire plugin in pom.xml).
+    String ddlAuto = environment.getProperty("spring.jpa.hibernate.ddl-auto");
+    assertThat(ddlAuto).isEqualTo("validate");
   }
 }
