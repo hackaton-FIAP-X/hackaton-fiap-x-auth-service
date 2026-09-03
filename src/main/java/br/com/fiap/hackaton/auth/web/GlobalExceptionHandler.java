@@ -1,6 +1,7 @@
 package br.com.fiap.hackaton.auth.web;
 
 import br.com.fiap.hackaton.auth.user.EmailAlreadyRegisteredException;
+import br.com.fiap.hackaton.auth.user.InvalidCredentialsException;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleEmailAlreadyRegistered(
       EmailAlreadyRegisteredException ex) {
     return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(ex.getMessage()));
+  }
+
+  @ExceptionHandler(InvalidCredentialsException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(ex.getMessage()));
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
