@@ -86,14 +86,12 @@ class ResourceServerEndToEndTest {
   @DynamicPropertySource
   static void jwksUri(DynamicPropertyRegistry registry) {
     registry.add(
-        "security.jwt.jwks-uri",
-        () -> "http://localhost:" + jwksPort + "/.well-known/jwks.json");
+        "security.jwt.jwks-uri", () -> "http://localhost:" + jwksPort + "/.well-known/jwks.json");
   }
 
   @Test
   void requestWithoutTokenReturns401() {
-    ResponseEntity<String> response =
-        restTemplate.getForEntity(url("/me"), String.class);
+    ResponseEntity<String> response = restTemplate.getForEntity(url("/me"), String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
   }
@@ -136,8 +134,7 @@ class ResourceServerEndToEndTest {
             .expirationTime(Date.from(Instant.now().plusSeconds(300)))
             .build();
     SignedJWT jwt =
-        new SignedJWT(
-            new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("test-key").build(), claims);
+        new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("test-key").build(), claims);
     jwt.sign(new RSASSASigner(keyPair.getPrivate()));
     return jwt.serialize();
   }

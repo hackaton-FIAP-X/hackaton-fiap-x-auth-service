@@ -136,7 +136,7 @@
                             <version>1.23.0</version>
                         </googleJavaFormat>
                         <importOrder>
-                            <order>java,javax,org,com</order>
+                            <order></order>
                         </importOrder>
                     </java>
                 </configuration>

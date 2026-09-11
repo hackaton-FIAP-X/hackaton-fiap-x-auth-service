@@ -44,8 +44,7 @@ class CurrentUserIdArgumentResolverTest {
     UUID userId = UUID.randomUUID();
     Jwt jwt = mock(Jwt.class);
     when(jwt.getSubject()).thenReturn(userId.toString());
-    SecurityContextHolder.getContext()
-        .setAuthentication(new TestingAuthenticationToken(jwt, null));
+    SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(jwt, null));
 
     UUID resolved = resolver.resolveArgument(annotatedParameter(), null, null, null);
 

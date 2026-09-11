@@ -33,8 +33,7 @@ class SecurityCommonsPropertiesTest {
   @Test
   void keepsExplicitPublicEndpointsWhenProvided() {
     var properties =
-        new SecurityCommonsProperties(
-            "https://issuer/jwks.json", null, List.of("/custom-health"));
+        new SecurityCommonsProperties("https://issuer/jwks.json", null, List.of("/custom-health"));
 
     assertThat(properties.publicEndpoints()).containsExactly("/custom-health");
   }

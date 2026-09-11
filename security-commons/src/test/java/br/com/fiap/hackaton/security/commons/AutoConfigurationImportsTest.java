@@ -27,6 +27,7 @@ class AutoConfigurationImportsTest {
 
     assertThat(lines)
         .containsExactlyInAnyOrder(
-            ResourceServerAutoConfiguration.class.getName(), WebMvcAutoConfiguration.class.getName());
+            ResourceServerAutoConfiguration.class.getName(),
+            WebMvcAutoConfiguration.class.getName());
   }
 }

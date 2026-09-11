@@ -1,8 +1,8 @@
 package br.com.fiap.hackaton.security.commons;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -80,9 +80,7 @@ public class ResourceServerAutoConfiguration {
                     .accessDeniedHandler(responder))
         .exceptionHandling(
             exceptions ->
-                exceptions
-                    .authenticationEntryPoint(responder)
-                    .accessDeniedHandler(responder))
+                exceptions.authenticationEntryPoint(responder).accessDeniedHandler(responder))
         .build();
   }
 }

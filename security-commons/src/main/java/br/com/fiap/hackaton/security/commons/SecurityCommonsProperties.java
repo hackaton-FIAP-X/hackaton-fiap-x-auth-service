@@ -4,7 +4,8 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "security.jwt")
-public record SecurityCommonsProperties(String jwksUri, String issuer, List<String> publicEndpoints) {
+public record SecurityCommonsProperties(
+    String jwksUri, String issuer, List<String> publicEndpoints) {
 
   static final List<String> DEFAULT_PUBLIC_ENDPOINTS =
       List.of(

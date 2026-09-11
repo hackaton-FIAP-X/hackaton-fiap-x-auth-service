@@ -25,7 +25,10 @@ class WebMvcAutoConfigurationTest {
           WebMvcConfigurer configurer = context.getBean(WebMvcConfigurer.class);
           List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
           configurer.addArgumentResolvers(resolvers);
-          assertThat(resolvers).hasSize(1).first().isInstanceOf(CurrentUserIdArgumentResolver.class);
+          assertThat(resolvers)
+              .hasSize(1)
+              .first()
+              .isInstanceOf(CurrentUserIdArgumentResolver.class);
         });
   }
 }
