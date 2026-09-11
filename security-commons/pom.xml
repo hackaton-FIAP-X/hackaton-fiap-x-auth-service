@@ -62,6 +62,11 @@
             <artifactId>jackson-databind</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <!-- Test: spring-boot-starter-test alone covers unit/context-runner tests.
              provided-scope spring-webmvc/servlet-api/jackson-databind above are already
              visible on the test classpath — do NOT redeclare them here with scope=test;
