@@ -49,3 +49,6 @@ logging:
 app:
   security:
     password-pepper: ${PASSWORD_PEPPER}
+    jwt:
+      private-key: ${JWT_PRIVATE_KEY}
+      public-key: ${JWT_PUBLIC_KEY}
