@@ -20,6 +20,14 @@
         <spotless.version>3.10.0</spotless.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/hackaton-FIAP-X/hackaton-fiap-x-auth-service</url>
+        </repository>
+    </distributionManagement>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
