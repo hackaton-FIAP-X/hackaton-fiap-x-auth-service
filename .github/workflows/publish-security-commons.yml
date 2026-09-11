@@ -20,6 +20,6 @@ jobs:
           distribution: 'temurin'
           server-id: github
       - name: Publish to GitHub Packages
-        run: ./mvnw -f security-commons/pom.xml -B deploy -DskipTests
+        run: ./mvnw -f security-commons/pom.xml -B deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

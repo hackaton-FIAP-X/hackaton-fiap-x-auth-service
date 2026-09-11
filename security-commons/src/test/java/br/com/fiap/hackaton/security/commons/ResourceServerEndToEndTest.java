@@ -94,6 +94,7 @@ class ResourceServerEndToEndTest {
     ResponseEntity<String> response = restTemplate.getForEntity(url("/me"), String.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    assertThat(response.getBody()).contains("urn:problem-type:unauthorized");
   }
 
   @Test

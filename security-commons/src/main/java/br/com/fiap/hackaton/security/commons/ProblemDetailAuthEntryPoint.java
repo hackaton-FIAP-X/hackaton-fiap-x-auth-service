@@ -30,6 +30,7 @@ public class ProblemDetailAuthEntryPoint implements AuthenticationEntryPoint, Ac
   public void commence(
       HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
       throws IOException {
+    response.setHeader("WWW-Authenticate", "Bearer");
     write(
         request,
         response,

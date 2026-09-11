@@ -25,6 +25,7 @@ class ProblemDetailAuthEntryPointTest {
     responder.commence(request, response, new BadCredentialsException("bad token"));
 
     assertThat(response.getStatus()).isEqualTo(401);
+    assertThat(response.getHeader("WWW-Authenticate")).isEqualTo("Bearer");
     JsonNode body = objectMapper.readTree(response.getContentAsString());
     assertThat(body.get("status").asInt()).isEqualTo(401);
     assertThat(body.get("type").asText()).isEqualTo("urn:problem-type:unauthorized");

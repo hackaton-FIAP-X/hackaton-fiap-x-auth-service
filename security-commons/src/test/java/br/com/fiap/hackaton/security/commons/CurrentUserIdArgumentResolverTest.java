@@ -58,6 +58,17 @@ class CurrentUserIdArgumentResolverTest {
         .hasMessageContaining("401");
   }
 
+  @Test
+  void throws401WhenJwtSubjectIsNotAValidUuid() throws Exception {
+    Jwt jwt = mock(Jwt.class);
+    when(jwt.getSubject()).thenReturn("not-a-uuid");
+    SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(jwt, null));
+
+    assertThatThrownBy(() -> resolver.resolveArgument(annotatedParameter(), null, null, null))
+        .isInstanceOf(ResponseStatusException.class)
+        .hasMessageContaining("401");
+  }
+
   private static MethodParameter annotatedParameter() throws NoSuchMethodException {
     Method method = SampleController.class.getMethod("withAnnotation", UUID.class);
     return new MethodParameter(method, 0);

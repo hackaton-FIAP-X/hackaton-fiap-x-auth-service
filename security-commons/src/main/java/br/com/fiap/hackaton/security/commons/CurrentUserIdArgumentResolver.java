@@ -30,6 +30,10 @@ public class CurrentUserIdArgumentResolver implements HandlerMethodArgumentResol
     if (authentication == null || !(authentication.getPrincipal() instanceof Jwt jwt)) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Request has no valid token");
     }
-    return UUID.fromString(jwt.getSubject());
+    try {
+      return UUID.fromString(jwt.getSubject());
+    } catch (IllegalArgumentException e) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Request has no valid token");
+    }
   }
 }
