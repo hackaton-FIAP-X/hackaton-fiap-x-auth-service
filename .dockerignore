@@ -1,0 +1,6 @@
+.git
+.claude
+.worktrees
+target
+docs
+*.md
