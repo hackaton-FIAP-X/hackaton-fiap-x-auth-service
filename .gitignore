@@ -34,3 +34,6 @@ build/
 
 # SDD worktrees (superpowers:using-git-worktrees)
 .worktrees/
+
+# SDD workspace (superpowers:subagent-driven-development)
+.superpowers/
