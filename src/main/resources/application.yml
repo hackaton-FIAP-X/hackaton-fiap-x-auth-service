@@ -64,3 +64,16 @@ app:
       login:
         capacity: 10
         window-seconds: 60
+
+---
+# Disable API documentation in production: reduces attack surface and avoids
+# publishing the API shape on a public deployment.
+spring:
+  config:
+    activate:
+      on-profile: prod
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
