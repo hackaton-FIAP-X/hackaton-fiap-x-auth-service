@@ -17,7 +17,6 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.Date;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,21 +27,31 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * A consumer that overrides only the {@link OAuth2TokenValidator} bean (not the whole {@link
+ * org.springframework.security.oauth2.jwt.JwtDecoder}) opts out of the built-in {@link
+ * SubjectIsUuidValidator} guarantee explicitly and in isolation, without losing the rest of the
+ * decoder's JWKS-based configuration.
+ */
 @SpringBootTest(
     webEnvironment = WebEnvironment.RANDOM_PORT,
-    classes = ResourceServerEndToEndTest.TestApp.class)
-class ResourceServerEndToEndTest {
+    classes = ResourceServerCustomValidatorEndToEndTest.TestApp.class)
+class ResourceServerCustomValidatorEndToEndTest {
 
   private static KeyPair keyPair;
   private static HttpServer jwksServer;
@@ -92,29 +101,7 @@ class ResourceServerEndToEndTest {
   }
 
   @Test
-  void requestWithoutTokenReturns401() {
-    ResponseEntity<String> response = restTemplate.getForEntity(url("/me"), String.class);
-
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    assertThat(response.getBody()).contains("urn:problem-type:unauthorized");
-  }
-
-  @Test
-  void requestWithValidTokenReturns200WithUserIdFromSubject() throws Exception {
-    UUID userId = UUID.randomUUID();
-    String token = signToken(userId.toString());
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(token);
-    ResponseEntity<String> response =
-        restTemplate.exchange(url("/me"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).isEqualTo(userId.toString());
-  }
-
-  @Test
-  void requestWithNonUuidSubjectReturns401() throws Exception {
+  void consumerSuppliedValidatorReplacesTheBuiltInSubjectUuidCheck() throws Exception {
     String token = signToken("not-a-uuid");
 
     HttpHeaders headers = new HttpHeaders();
@@ -122,7 +109,7 @@ class ResourceServerEndToEndTest {
     ResponseEntity<String> response =
         restTemplate.exchange(url("/me"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
   }
 
   private String url(String path) {
@@ -145,13 +132,19 @@ class ResourceServerEndToEndTest {
   @SpringBootConfiguration
   @EnableAutoConfiguration
   @Import(MeController.class)
-  static class TestApp {}
+  static class TestApp {
+
+    @Bean
+    OAuth2TokenValidator<Jwt> jwtTokenValidator() {
+      return JwtValidators.createDefault();
+    }
+  }
 
   @RestController
   static class MeController {
     @GetMapping("/me")
-    String me(@CurrentUserId UUID userId) {
-      return userId.toString();
+    String me() {
+      return "ok";
     }
   }
 }

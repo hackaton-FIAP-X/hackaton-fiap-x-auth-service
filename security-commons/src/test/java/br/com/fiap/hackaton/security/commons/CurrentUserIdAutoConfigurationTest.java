@@ -11,11 +11,11 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-class WebMvcAutoConfigurationTest {
+class CurrentUserIdAutoConfigurationTest {
 
   private final ApplicationContextRunner contextRunner =
       new ApplicationContextRunner()
-          .withConfiguration(AutoConfigurations.of(WebMvcAutoConfiguration.class));
+          .withConfiguration(AutoConfigurations.of(CurrentUserIdAutoConfiguration.class));
 
   @Test
   void registersTheCurrentUserIdArgumentResolver() {
