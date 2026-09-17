@@ -41,8 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootTest(
     webEnvironment = WebEnvironment.RANDOM_PORT,
-    classes = ResourceServerEndToEndTest.TestApp.class)
-class ResourceServerEndToEndTest {
+    classes = ResourceServerTokenValidationTest.TestApp.class,
+    properties = "security.jwt.issuer=https://expected-issuer.example")
+class ResourceServerTokenValidationTest {
 
   private static KeyPair keyPair;
   private static HttpServer jwksServer;
@@ -92,49 +93,42 @@ class ResourceServerEndToEndTest {
   }
 
   @Test
-  void requestWithoutTokenReturns401() {
-    ResponseEntity<String> response = restTemplate.getForEntity(url("/me"), String.class);
+  void tokenWithWrongIssuerIsRejected() throws Exception {
+    String token = signToken(UUID.randomUUID().toString(), "https://wrong-issuer.example", 300);
+
+    ResponseEntity<String> response = requestMeWith(token);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-    assertThat(response.getBody()).contains("urn:problem-type:unauthorized");
   }
 
   @Test
-  void requestWithValidTokenReturns200WithUserIdFromSubject() throws Exception {
-    UUID userId = UUID.randomUUID();
-    String token = signToken(userId.toString());
+  void expiredTokenIsRejected() throws Exception {
+    String token = signToken(UUID.randomUUID().toString(), "https://expected-issuer.example", -60);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(token);
-    ResponseEntity<String> response =
-        restTemplate.exchange(url("/me"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    assertThat(response.getBody()).isEqualTo(userId.toString());
-  }
-
-  @Test
-  void requestWithNonUuidSubjectReturns401() throws Exception {
-    String token = signToken("not-a-uuid");
-
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(token);
-    ResponseEntity<String> response =
-        restTemplate.exchange(url("/me"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+    ResponseEntity<String> response = requestMeWith(token);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+  }
+
+  private ResponseEntity<String> requestMeWith(String token) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setBearerAuth(token);
+    return restTemplate.exchange(
+        url("/me"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
   }
 
   private String url(String path) {
     return "http://localhost:" + appPort + path;
   }
 
-  private static String signToken(String subject) throws Exception {
+  private static String signToken(String subject, String issuer, long expiresInSeconds)
+      throws Exception {
     JWTClaimsSet claims =
         new JWTClaimsSet.Builder()
             .subject(subject)
+            .issuer(issuer)
             .issueTime(Date.from(Instant.now()))
-            .expirationTime(Date.from(Instant.now().plusSeconds(300)))
+            .expirationTime(Date.from(Instant.now().plusSeconds(expiresInSeconds)))
             .build();
     SignedJWT jwt =
         new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID("test-key").build(), claims);

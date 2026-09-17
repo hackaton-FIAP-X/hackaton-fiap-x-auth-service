@@ -2,9 +2,8 @@ name: Publish security-commons
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'security-commons/**'
+    tags:
+      - 'security-commons-v*'
 
 jobs:
   publish:
@@ -19,6 +18,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           server-id: github
+      - name: Set release version from tag
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/security-commons-v}"
+          ./mvnw -f security-commons/pom.xml -B org.codehaus.mojo:versions-maven-plugin:2.17.1:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false
       - name: Publish to GitHub Packages
         run: ./mvnw -f security-commons/pom.xml -B deploy
         env:

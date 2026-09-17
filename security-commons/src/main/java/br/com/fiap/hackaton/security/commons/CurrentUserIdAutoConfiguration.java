@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @AutoConfiguration
 @ConditionalOnClass(WebMvcConfigurer.class)
-public class WebMvcAutoConfiguration {
+public class CurrentUserIdAutoConfiguration {
 
   @Bean
   @ConditionalOnMissingBean

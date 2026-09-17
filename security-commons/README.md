@@ -60,17 +60,45 @@ requires to be a valid UUID — never from the request body or query string.
 
 ## Overriding a default
 
-Most beans (`ProblemDetailAuthEntryPoint`, `JwtDecoder`, `SecurityFilterChain`,
-`CurrentUserIdArgumentResolver`, and others) are `@ConditionalOnMissingBean`:
-declare your own bean of that type in your application and the
-autoconfiguration backs off in favor of yours — e.g. for a custom error
-responder, declare your own `ProblemDetailAuthEntryPoint` bean.
+Most beans (`ProblemDetailAuthEntryPoint`, `JwtDecoder`, `OAuth2TokenValidator<Jwt>`,
+`SecurityFilterChain`, `CurrentUserIdArgumentResolver`, and others) are
+`@ConditionalOnMissingBean`: declare your own bean of that type in your
+application and the autoconfiguration backs off in favor of yours — e.g. for
+a custom error responder, declare your own `ProblemDetailAuthEntryPoint` bean.
+
+If you only need to change *validation* rules (e.g. check an extra claim)
+without losing the JWKS-based decoding logic, override the
+`OAuth2TokenValidator<Jwt>` bean instead of the whole `JwtDecoder` — that way
+you keep the decoder wiring untouched and only decide explicitly whether to
+keep the built-in `sub`-is-UUID check (compose it with
+`DelegatingOAuth2TokenValidator` if you still want it).
 
 The one exception is the `WebMvcConfigurer` that registers the
 `CurrentUserIdArgumentResolver` with Spring MVC
-(`WebMvcAutoConfiguration#securityCommonsWebMvcConfigurer`) — that bean is
-*not* conditional, since `WebMvcConfigurer` beans are additive by design in
+(`CurrentUserIdAutoConfiguration#securityCommonsWebMvcConfigurer`) — that bean
+is *not* conditional, since `WebMvcConfigurer` beans are additive by design in
 Spring, not mutually exclusive. To customize the resolver's behavior, don't
 try to override that configurer; instead supply your own
 `CurrentUserIdArgumentResolver` bean (which *is* conditional), and the
 configurer will register yours instead.
+
+## CORS
+
+The default `SecurityFilterChain` enables Spring Security's CORS support
+(`.cors(Customizer.withDefaults())`), which is a no-op until your application
+declares its own `CorsConfigurationSource` bean — e.g.:
+
+```java
+@Bean
+CorsConfigurationSource corsConfigurationSource() {
+  CorsConfiguration configuration = new CorsConfiguration();
+  configuration.setAllowedOrigins(List.of("https://your-frontend.example"));
+  configuration.setAllowedMethods(List.of("GET", "POST"));
+  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  source.registerCorsConfiguration("/**", configuration);
+  return source;
+}
+```
+
+Without such a bean, cross-origin requests behave exactly as before (no CORS
+headers are added).
