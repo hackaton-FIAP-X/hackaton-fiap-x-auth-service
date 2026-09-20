@@ -20,8 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 class OpenApiDocumentationTest {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private MockMvc mockMvc;
@@ -50,11 +49,9 @@ class OpenApiDocumentationTest {
         .perform(get("/v3/api-docs"))
         .andExpect(status().isOk())
         .andExpect(
-            jsonPath("$.components.schemas.RegisterRequest.properties.email.description")
-                .exists())
+            jsonPath("$.components.schemas.RegisterRequest.properties.email.description").exists())
         .andExpect(
-            jsonPath("$.components.schemas.LoginRequest.properties.password.description")
-                .exists());
+            jsonPath("$.components.schemas.LoginRequest.properties.password.description").exists());
   }
 
   @Test

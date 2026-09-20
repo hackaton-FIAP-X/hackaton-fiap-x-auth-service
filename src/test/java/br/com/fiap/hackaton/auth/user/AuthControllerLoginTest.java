@@ -5,9 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.jayway.jsonpath.JsonPath;
-import io.jsonwebtoken.Jwts;
 import java.security.PublicKey;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,13 +18,16 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.jayway.jsonpath.JsonPath;
+
+import io.jsonwebtoken.Jwts;
+
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthControllerLoginTest {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private MockMvc mockMvc;
@@ -56,8 +58,7 @@ class AuthControllerLoginTest {
             .andExpect(jsonPath("$.token").exists())
             .andReturn();
 
-    String token =
-        JsonPath.read(result.getResponse().getContentAsString(), "$.token");
+    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.token");
     var claims =
         Jwts.parser().verifyWith(jwtPublicKey).build().parseSignedClaims(token).getPayload();
 

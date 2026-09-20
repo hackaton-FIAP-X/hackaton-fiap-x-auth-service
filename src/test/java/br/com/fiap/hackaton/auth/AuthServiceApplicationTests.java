@@ -11,8 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 class AuthServiceApplicationTests {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Test

@@ -3,6 +3,7 @@ package br.com.fiap.hackaton.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.sql.DataSource;
+
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.MigrationInfo;
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 class FlywayMigrationTest {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private Flyway flyway;

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+
 import org.junit.jupiter.api.Test;
 
 class JwtKeyPairConsistencyValidatorTest {
@@ -13,8 +14,7 @@ class JwtKeyPairConsistencyValidatorTest {
   @Test
   void doesNotThrowWhenKeysFormAMatchingPair() throws NoSuchAlgorithmException {
     KeyPair keyPair = generateRsaKeyPair();
-    var validator =
-        new JwtKeyPairConsistencyValidator(keyPair.getPrivate(), keyPair.getPublic());
+    var validator = new JwtKeyPairConsistencyValidator(keyPair.getPrivate(), keyPair.getPublic());
 
     assertThatCode(() -> validator.run(null)).doesNotThrowAnyException();
   }
@@ -23,8 +23,7 @@ class JwtKeyPairConsistencyValidatorTest {
   void throwsWhenKeysDoNotFormAMatchingPair() throws NoSuchAlgorithmException {
     KeyPair keyPairA = generateRsaKeyPair();
     KeyPair keyPairB = generateRsaKeyPair();
-    var validator =
-        new JwtKeyPairConsistencyValidator(keyPairA.getPrivate(), keyPairB.getPublic());
+    var validator = new JwtKeyPairConsistencyValidator(keyPairA.getPrivate(), keyPairB.getPublic());
 
     assertThatThrownBy(() -> validator.run(null))
         .isInstanceOf(IllegalStateException.class)

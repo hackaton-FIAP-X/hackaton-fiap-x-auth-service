@@ -1,12 +1,14 @@
 package br.com.fiap.hackaton.auth.security;
 
-import br.com.fiap.hackaton.auth.user.User;
-import io.jsonwebtoken.Jwts;
 import java.security.PrivateKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+
 import org.springframework.stereotype.Service;
+
+import br.com.fiap.hackaton.auth.user.User;
+import io.jsonwebtoken.Jwts;
 
 @Service
 public class JwtTokenService {

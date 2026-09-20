@@ -13,7 +13,9 @@ public record RegisterRequest(
         @NotBlank(message = "email is required")
         @Email(message = "email must be a valid email address")
         String email,
-    @Schema(description = "Senha em texto plano, entre 8 e 128 caracteres", example = "SenhaForte123")
+    @Schema(
+            description = "Senha em texto plano, entre 8 e 128 caracteres",
+            example = "SenhaForte123")
         @NotBlank(message = "password is required")
         @Size(min = 8, max = 128, message = "password must be between 8 and 128 characters")
         String password) {

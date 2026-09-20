@@ -20,8 +20,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("prod")
 class OpenApiDisabledInProdTest {
 
-  @Container
-  @ServiceConnection
+  @Container @ServiceConnection
   static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   @Autowired private MockMvc mockMvc;
