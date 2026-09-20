@@ -3,8 +3,10 @@ package br.com.fiap.hackaton.auth.security;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class PepperedPasswordEncoder implements PasswordEncoder {

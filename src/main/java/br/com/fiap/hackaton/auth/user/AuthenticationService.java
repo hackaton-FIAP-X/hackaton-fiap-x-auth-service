@@ -1,9 +1,11 @@
 package br.com.fiap.hackaton.auth.user;
 
-import br.com.fiap.hackaton.auth.security.JwtTokenService;
 import java.util.Locale;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import br.com.fiap.hackaton.auth.security.JwtTokenService;
 
 @Service
 public class AuthenticationService {

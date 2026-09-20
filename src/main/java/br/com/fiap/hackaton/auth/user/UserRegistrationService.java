@@ -1,6 +1,7 @@
 package br.com.fiap.hackaton.auth.user;
 
 import java.util.Locale;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

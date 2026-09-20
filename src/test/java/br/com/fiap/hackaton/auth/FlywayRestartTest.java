@@ -13,7 +13,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class FlywayRestartTest {
 
-  @Container static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+  @Container
+  static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
 
   private Flyway flywayPointingAtContainer() {
     return Flyway.configure()

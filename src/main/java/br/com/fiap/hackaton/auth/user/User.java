@@ -1,5 +1,10 @@
 package br.com.fiap.hackaton.auth.user;
 
+import java.time.Instant;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,9 +12,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import java.time.Instant;
-import java.util.UUID;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "users")
